@@ -52,8 +52,10 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Settings\CubeSpawnSettings.cs" />
      <Compile Include="Assets\Scripts\Cubes\CubeCollection.cs" />
      <Compile Include="Assets\Scripts\Blank.cs" />
+     <Compile Include="Assets\Scripts\General\CubeSpawnService.cs" />
      <Compile Include="Assets\Scripts\Cubes\ECubeType.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerView.cs" />
      <Compile Include="Assets\Scripts\General\Movable.cs" />

@@ -11,7 +11,8 @@ namespace Player
 
         private void Start()
         {
-            view.SubscribeToCollectionCollision(OnCubeCollectionCollide);
+            view.AddCubesToCollection(1);
+            view.SubscribeToCollectionCollision(OnCubeCollectionCollide); 
         }
 
         private void OnCubeCollectionCollide(Collision collision)
@@ -19,28 +20,36 @@ namespace Player
             var maximalHigh = 0;
             // foreach (var contact in collision.contacts)
             // {
-                if (!collision.collider.TryGetComponent<Movable>(out var movable))
-                    return;
-                switch (movable.CubeType)
+            if (!collision.collider.TryGetComponent<Movable>(out var movable))
+                return;
+            switch (movable.CubeType)
+            {
+                case ECubeType.Negative:
                 {
-                    case ECubeType.Negative:
+                    foreach (var collection in movable.NegativeCubeCollection)
                     {
-                        if (movable.CubeCollection.GetCollectionSize() > maximalHigh)
-                            maximalHigh = movable.CubeCollection.GetCollectionSize();
-                        break;
+                         Debug.Log($"{collection.transform.name} ==== {Vector3.Distance(collection.transform.position, transform.position)}");
+                        if (Vector3.Distance(collection.transform.position, transform.position) < 1.2f)
+                        {
+                            if (collection.GetCollectionSize() > maximalHigh)
+                                maximalHigh = collection.GetCollectionSize();
+                        }
                     }
-                    case ECubeType.Positive:
-                    {
-                        view.AddCubesToCollection(movable.CubeCollection.GetCollectionSize());
-                        Destroy(movable.gameObject);
-                        break;
-                    }
-                    default:
-                        throw new Exception("[PlayerController] Invalid cube type");
-                // }
 
-                view.AddCubesToCollection(maximalHigh);
+                    break;
+                }
+                case ECubeType.Positive:
+                {
+                    view.AddCubesToCollection(movable.CubeCollection.GetCollectionSize());
+                    Destroy(movable.gameObject);
+                    break;
+                }
+                default:
+                    throw new Exception("[PlayerController] Invalid cube type");
             }
+
+            view.AddCubesToCollection(-maximalHigh);
+            // }
         }
     }
 }
