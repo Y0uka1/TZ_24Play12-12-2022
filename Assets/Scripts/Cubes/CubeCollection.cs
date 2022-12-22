@@ -22,7 +22,7 @@ namespace Cubes
             //  _cubes.Add(primalCube);
         }
 
-        public void AddCubes(int amount)
+        public int AddCubes(int amount)
         {
             for (int i = 0; i < Math.Abs(amount); i++)
             {
@@ -34,11 +34,10 @@ namespace Cubes
                     cube.transform.localPosition = new Vector3(0, 0 - 0.95f * _cubes.Count,
                         0);
                 }
-                else //if (amount < 0)
+                else
                 {
                     if (_cubes.Count <= 0)
-                        throw new Exception("[CubeCollection] Can't subtract from empty collection");
-                    // Destroy(_cubes[_cubes.Count - 1]);
+                       break;
                     var removedCube = _cubes[_cubes.Count-1];
                     var wPosition = removedCube.transform.position;
                     _cubes.Remove(removedCube);
@@ -48,6 +47,8 @@ namespace Cubes
                     root.localPosition -= new Vector3(0, 0.95f, 0);
                 }
             }
+
+            return _cubes.Count;
         }
 
         public int GetCollectionSize()
@@ -59,10 +60,10 @@ namespace Cubes
             while (timer>0)
             {
                 gameObject.transform.localPosition-= new Vector3(0,0,0.2f);
+                timer -= Time.deltaTime;
                 yield return new WaitForFixedUpdate();
             }
             Destroy(gameObject);
-            // _cubes.Remove(gameObject);
         }
     }
 }

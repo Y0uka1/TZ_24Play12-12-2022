@@ -8,30 +8,22 @@ namespace Player
     {
         [SerializeField] private GameObject stickMen;
         [SerializeField] private CubeCollection cubeCollection;
+        [SerializeField] private Animator animator;
+        private static readonly int Jump = Animator.StringToHash("Jump");
 
-        public void AddCubesToCollection(int amount)
+        public int AddCubesToCollection(int amount)
         {
-            cubeCollection.AddCubes(amount);
+            return cubeCollection.AddCubes(amount);
         }
         
         public void SubscribeToCollectionCollision(Action<Collision> action) =>
             cubeCollection.GetComponent<CollisionToEvent>().OnCubeCollide += action; //Ugly. Need refactor
 
-        private void FixedUpdate()
+        public void PlayStackAnimation()
         {
-            //TODO DELETE
-            if (Input.GetKeyDown(KeyCode.E))
-                cubeCollection.AddCubes(1);
-            if (Input.GetKeyDown(KeyCode.Q))
-                cubeCollection.AddCubes(-1);
-            if (Input.GetKey(KeyCode.A))
-                transform.position -= new Vector3(0.2f, 0, 0);
-            if (Input.GetKey(KeyCode.D))
-                transform.position += new Vector3(0.2f, 0, 0);
-            if (Input.GetKey(KeyCode.W))
-                transform.position += new Vector3(0, 0, 0.2f);
-            if (Input.GetKey(KeyCode.S))
-                transform.position -= new Vector3(0, 0, 0.2f);
+            animator.SetBool(Jump,true);
         }
+
+       
     }
 }

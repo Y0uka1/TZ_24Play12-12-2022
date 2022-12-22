@@ -2,24 +2,37 @@ using System;
 using Cubes;
 using General;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Player
 {
     public class PlayerController : MonoBehaviour
     {
         [SerializeField] private PlayerView view;
+        [SerializeField] private Slider slider;
+        public static Action OnCubesAmountZeroOrLess;
+        private bool isPlaying = true;
 
         private void Start()
         {
+            slider.minValue = -0.36f;
+            slider.maxValue = 0.36f;
             view.AddCubesToCollection(1);
-            view.SubscribeToCollectionCollision(OnCubeCollectionCollide); 
+            view.SubscribeToCollectionCollision(OnCubeCollectionCollide);
+            gameObject.GetComponentInChildren<Rigidbody>().sleepThreshold = 0f;
+            OnCubesAmountZeroOrLess += () => { isPlaying = false; };
+        }
+
+        private void Update()
+        {
+            transform.localPosition = new Vector3(slider.value, transform.localPosition.y, transform.localPosition.z);
         }
 
         private void OnCubeCollectionCollide(Collision collision)
         {
+            if (!isPlaying)
+                return;
             var maximalHigh = 0;
-            // foreach (var contact in collision.contacts)
-            // {
             if (!collision.collider.TryGetComponent<Movable>(out var movable))
                 return;
             switch (movable.CubeType)
@@ -28,7 +41,6 @@ namespace Player
                 {
                     foreach (var collection in movable.NegativeCubeCollection)
                     {
-                         Debug.Log($"{collection.transform.name} ==== {Vector3.Distance(collection.transform.position, transform.position)}");
                         if (Vector3.Distance(collection.transform.position, transform.position) < 1.2f)
                         {
                             if (collection.GetCollectionSize() > maximalHigh)
@@ -41,6 +53,7 @@ namespace Player
                 case ECubeType.Positive:
                 {
                     view.AddCubesToCollection(movable.CubeCollection.GetCollectionSize());
+                    view.PlayStackAnimation();
                     Destroy(movable.gameObject);
                     break;
                 }
@@ -48,8 +61,9 @@ namespace Player
                     throw new Exception("[PlayerController] Invalid cube type");
             }
 
-            view.AddCubesToCollection(-maximalHigh);
-            // }
+            var cubesAmount = view.AddCubesToCollection(-maximalHigh);
+            if (cubesAmount <= 0)
+                OnCubesAmountZeroOrLess?.Invoke();
         }
     }
 }
